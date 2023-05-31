@@ -3,6 +3,8 @@
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+import logging
+_logger = logging.getLogger(__name__)
 
 _STATES = [
     ("draft", "Draft"),
@@ -315,12 +317,13 @@ class PurchaseRequestLine(models.Model):
         for rec in self:
             rec.purchased_qty = 0.0
             for line in rec.purchase_lines.filtered(lambda x: x.state != "cancel"):
-                if rec.product_uom_id and line.product_uom != rec.product_uom_id:
-                    rec.purchased_qty += line.product_uom._compute_quantity(
-                        line.product_qty, rec.product_uom_id
-                    )
-                else:
-                    rec.purchased_qty += line.product_qty
+                _logger.info(line.product_uom)
+                #if rec.product_uom_id and line.product_uom != rec.product_uom_id:
+                #    rec.purchased_qty += line.product_uom._compute_quantity(
+                #        line.product_qty, rec.product_uom_id
+                #    )
+                #else:
+                #    rec.purchased_qty += line.product_qty
 
     @api.depends("purchase_lines.state", "purchase_lines.order_id.state")
     def _compute_purchase_state(self):
