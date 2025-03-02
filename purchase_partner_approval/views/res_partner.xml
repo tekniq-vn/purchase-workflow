@@ -7,6 +7,7 @@
 
             <xpath expr="//group[@name='purchase']" position="inside">
                 <field name="state" invisible="1" />
+                <field name="supplier_rank" invisible="1"/>
                 <field name="candidate_purchase" states="draft" />
                 <field name="purchase_ok" />
             </xpath>

@@ -2,6 +2,8 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class Partner(models.Model):
@@ -19,7 +21,7 @@ class Partner(models.Model):
     @api.model
     def default_get(self, fields):
         res = super().default_get(fields)
-        if "candidate_purchase" in fields and "candidate_purchase" not in res:
+        if "candidate_purchase" in fields and "candidate_purchase" not in res and "supplier_rank" in res:
             # Set default when creating from Purchase App menu
             res["candidate_purchase"] = bool(res.get("supplier_rank"))
         return res
@@ -39,6 +41,10 @@ class Partner(models.Model):
 
     @api.model
     def create(self, vals):
+        search_partner_mode = self.env.context.get('res_partner_search_mode')
+        is_supplier = search_partner_mode == 'supplier'
+        if is_supplier and 'candidate_purchase' not in vals:
+            vals['candidate_purchase'] = True
         new = super().create(vals)
         new._set_purchase_ok()
         return new
